@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+# encoding: UTF-8
 #
 # (c) 2008, Levin Alexander <http://levinalex.net>
 #
@@ -10,7 +11,7 @@ require 'enumerator'
 module Base32
 end
 
-# encode a value with the encoding defined by _Douglas_ _Crockford_ in 
+# encode a value with the encoding defined by _Douglas_ _Crockford_ in
 # <http://www.crockford.com/wrmg/base32.html>
 #
 # this is *not* the same as the Base32 encoding defined in RFC 4648
@@ -35,16 +36,16 @@ end
 # If the bit-length of the number to be encoded is not a multiple of 5 bits,
 # then zero-extend the number to make its bit-length a multiple of 5.
 #
-# Hyphens (-) can be inserted into symbol strings. This can partition a 
+# Hyphens (-) can be inserted into symbol strings. This can partition a
 # string into manageable pieces, improving readability by helping to prevent
 # confusion. Hyphens are ignored during decoding. An application may look for
 # hyphens to assure symbol string correctness.
 #
 #
 class Base32::Crockford
-  ENCODE_CHARS = 
+  ENCODE_CHARS =
     %w(0 1 2 3 4 5 6 7 8 9 A B C D E F G H J K M N P Q R S T V W X Y Z ?)
-    
+
   DECODE_MAP = ENCODE_CHARS.to_enum(:each_with_index).inject({}) do |h,(c,i)|
     h[c] = i; h
   end.merge({'I' => 1, 'L' => 1, 'O' => 0})
@@ -95,8 +96,8 @@ class Base32::Crockford
   # decoded
   #
   def self.decode(string)
-    clean(string).split(//).map { |char| 
-      DECODE_MAP[char] or return nil 
+    clean(string).split(//).map { |char|
+      DECODE_MAP[char] or return nil
     }.inject(0) { |result,val| (result << 5) + val }
   end
 
@@ -106,17 +107,17 @@ class Base32::Crockford
     decode(string) or raise ArgumentError
   end
 
-  # return the canonical encoding of a string. converts it to uppercase 
+  # return the canonical encoding of a string. converts it to uppercase
   # and removes hyphens
   #
   # replaces invalid characters with a question mark ('?')
   #
   def self.normalize(string)
-    clean(string).split(//).map { |char| 
+    clean(string).split(//).map { |char|
       ENCODE_CHARS[DECODE_MAP[char] || 32]
     }.join
   end
-  
+
   # returns false iff the string contains invalid characters and can't be
   # decoded
   #
@@ -143,7 +144,7 @@ if __FILE__ == $0
     def test_encoding_and_decoding_single_chars
       from = (0..31).to_a
       to = %w(0 1 2 3 4 5 6 7 8 9 A B C D E F G H J K M N P Q R S T V W X Y Z)
-      
+
       from.zip(to) do |symbol_value, encode_symbol|
         assert_equal encode_symbol, Base32::Crockford.encode(symbol_value)
         assert_equal symbol_value, Base32::Crockford.decode(encode_symbol)
@@ -160,15 +161,15 @@ if __FILE__ == $0
     end
 
     def test_decoding_normalizes_symbols
-      assert_equal Base32::Crockford.decode('11100110'), 
+      assert_equal Base32::Crockford.decode('11100110'),
                    Base32::Crockford.decode('IL1O0ilo')
     end
 
     def test_decoding_lowercase
-      assert_equal Base32::Crockford.decode("abcdefghijklmnopqrstvwxyz"), 
+      assert_equal Base32::Crockford.decode("abcdefghijklmnopqrstvwxyz"),
                    Base32::Crockford.decode("ABCDEFGHIJKLMNOPQRSTVWXYZ")
     end
-    
+
     def test_decoding_invalid_strings
       assert_equal nil, Base32::Crockford.decode("Ü'+?")
       assert_raises(ArgumentError) { Base32::Crockford.decode!("'+?") }
@@ -177,12 +178,12 @@ if __FILE__ == $0
     def test_decode_should_ignore_hyphens
       assert_equal 1234, Base32::Crockford.decode("1-6-j")
     end
-    
+
     def test_normalize
       assert_equal "HE110W0R1D", Base32::Crockford.normalize("hello-world")
       assert_equal "B?123", Base32::Crockford.normalize("BU-123")
     end
-    
+
     def test_valid
       assert_equal true, Base32::Crockford.valid?("hello-world")
       assert_equal false, Base32::Crockford.valid?("BU-123")
@@ -190,9 +191,9 @@ if __FILE__ == $0
 
     def test_length_and_hyphenization
       assert_equal "0016J", Base32::Crockford.encode(1234, :length => 5)
-      assert_equal "0-01-6J", 
+      assert_equal "0-01-6J",
         Base32::Crockford.encode(1234, :length => 5, :split => 2)
-      assert_equal "00-010", 
+      assert_equal "00-010",
         Base32::Crockford.encode(32, :length => 5, :split => 3)
     end
   end
