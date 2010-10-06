@@ -8,6 +8,12 @@ Installation
     $ gem sources -a http://gems.github.com
     $ sudo gem install levinalex-base32
 
+Changes
+=======
+
+    0.0.2 - ruby 1.9 compatibility
+    0.0.1 - initial release
+
 Usage
 =====
 

@@ -1,6 +1,6 @@
 spec = Gem::Specification.new do |s|
   s.name = 'base32'
-  s.version = "0.0.1"
+  s.version = "0.0.2"
   s.summary = "32-symbol notation for expressing numbers in a form that can be conveniently and accurately transmitted between humans"
   s.files = ["lib/base32/crockford.rb", "README.markdown"]
   s.require_path = 'lib'
