@@ -170,11 +170,6 @@ if __FILE__ == $0
                    Base32::Crockford.decode("ABCDEFGHIJKLMNOPQRSTVWXYZ")
     end
 
-    def test_decoding_invalid_strings
-      assert_equal nil, Base32::Crockford.decode("Ü'+?")
-      assert_raises(ArgumentError) { Base32::Crockford.decode!("'+?") }
-    end
-
     def test_decode_should_ignore_hyphens
       assert_equal 1234, Base32::Crockford.decode("1-6-j")
     end
