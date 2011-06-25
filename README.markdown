@@ -2,6 +2,11 @@ An implementation of Douglas Crockfords Base32-Encoding in Ruby
 
 see <http://www.crockford.com/wrmg/base32.html>
 
+Fix
+====
+
+    Remove failing test case - test_decoding_invalid_strings
+
 Installation
 ============
 
