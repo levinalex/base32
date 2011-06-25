@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 require 'test/unit'
 require 'base32/crockford'
 
@@ -30,6 +32,11 @@ class TestBase32Crockford < Test::Unit::TestCase
   def test_decoding_lowercase
     assert_equal Base32::Crockford.decode("abcdefghijklmnopqrstvwxyz"),
       Base32::Crockford.decode("ABCDEFGHIJKLMNOPQRSTVWXYZ")
+  end
+
+  def test_decoding_invalid_strings
+    assert_equal nil, Base32::Crockford.decode("Ü'+?")
+    assert_raises(ArgumentError) { Base32::Crockford.decode!("'+?") }
   end
 
   def test_decode_should_ignore_hyphens
