@@ -1,5 +1,6 @@
-task :test do
-  sh "ruby lib/base32/crockford.rb"
-end
+$LOAD_PATH.unshift './lib'
+
+require 'rake/testtask'
+Rake::TestTask.new(:test)
 
 task :default => :test
