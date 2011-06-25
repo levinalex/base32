@@ -10,4 +10,5 @@ spec = Gem::Specification.new do |s|
   s.author = "Levin Alexander"
   s.homepage = "http://levinalex.net/src/base32"
   s.email = "mail@levinalex.net"
+  s.add_development_dependency 'rake'
 end
