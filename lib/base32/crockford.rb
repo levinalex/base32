@@ -73,8 +73,7 @@ class Base32::Crockford
 
     if opts[:split]
       str = str.reverse
-      str = str.scan(/.{1,#{opts[:split]}}/).map { |x| x.reverse }
-      str = str.reverse.join("-")
+      str = str.scan(/.{1,#{opts[:split]}}/).join("-").reverse
     end
 
     str
