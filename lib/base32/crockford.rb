@@ -41,16 +41,22 @@ end
 #
 #
 class Base32::Crockford
-  VERSION = "0.1.0"
+  VERSION = "0.2.0"
 
   ENCODE_CHARS =
     %w(0 1 2 3 4 5 6 7 8 9 A B C D E F G H J K M N P Q R S T V W X Y Z ?)
+
+  CHECKSUM_MAP = { "*" => 32, "~" => 33, "$" => 34, "=" => 35, "U" => 36 }
 
   DECODE_MAP = ENCODE_CHARS.to_enum(:each_with_index).inject({}) do |h,(c,i)|
     h[c] = i; h
   end.merge({'I' => 1, 'L' => 1, 'O' => 0})
 
   # encodes an integer into a string
+  #
+  # when +checksum+ is given, a checksum is added at the end of the the string,
+  # calculated as modulo 37 of +number+. Five additional checksum symbols are
+  # used for symbol values 32-36
   #
   # when +split+ is given a hyphen is inserted every <n> characters to improve
   # readability
@@ -63,11 +69,13 @@ class Base32::Crockford
   #
   def self.encode(number, opts = {})
     # verify options
-    raise ArgumentError unless (opts.keys - [:length, :split] == [])
+    raise ArgumentError unless (opts.keys - [:length, :split, :checksum] == [])
 
     str = number.to_s(2).reverse.scan(/.{1,5}/).map do |bits|
       ENCODE_CHARS[bits.reverse.to_i(2)]
     end.reverse.join
+
+    str = str + ENCODE_CHARS[number % 37] if opts[:checksum]
 
     str = str.rjust(opts[:length], '0') if opts[:length]
 
@@ -93,17 +101,26 @@ class Base32::Crockford
   #   Base32::Crockford.decode("3G923-0VQVS") # => 123456789012345
   #
   # returns +nil+ if the string contains invalid characters and can't be
-  # decoded
+  # decoded, or if checksum option is used and checksum is incorrect
   #
-  def self.decode(string)
-    clean(string).split(//).map { |char|
+  def self.decode(string, opts = {})
+    if opts[:checksum]
+      checksum_char = string.slice!(-1)
+      checksum_number = DECODE_MAP.merge(CHECKSUM_MAP)[checksum_char]
+    end
+
+    number = clean(string).split(//).map { |char|
       DECODE_MAP[char] or return nil
     }.inject(0) { |result,val| (result << 5) + val }
+
+    number % 37 == checksum_number or return nil if opts[:checksum]
+
+    number
   end
 
   # same as decode, but raises ArgumentError when the string can't be decoded
   #
-  def self.decode!(string)
+  def self.decode!(string, opts = {})
     decode(string) or raise ArgumentError
   end
 
@@ -112,17 +129,23 @@ class Base32::Crockford
   #
   # replaces invalid characters with a question mark ('?')
   #
-  def self.normalize(string)
-    clean(string).split(//).map { |char|
+  def self.normalize(string, opts = {})
+    checksum_char = string.slice!(-1) if opts[:checksum]
+
+    string = clean(string).split(//).map { |char|
       ENCODE_CHARS[DECODE_MAP[char] || 32]
     }.join
+
+    string = string + checksum_char if opts[:checksum]
+
+    string
   end
 
-  # returns false iff the string contains invalid characters and can't be
+  # returns false if the string contains invalid characters and can't be
   # decoded
   #
-  def self.valid?(string)
-    !(normalize(string) =~ /\?/)
+  def self.valid?(string, opts = {})
+    !(normalize(string, opts) =~ /\?/)
   end
 
   class << self
