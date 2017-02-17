@@ -12,7 +12,7 @@ spec = Gem::Specification.new do |s|
 
   s.require_path = 'lib'
   s.author = "Levin Alexander"
-  s.homepage = "http://levinalex.net/src/base32"
+  s.homepage = "https://github.com/levinalex/base32"
   s.email = "mail@levinalex.net"
 
   s.add_development_dependency 'rake'
