@@ -48,9 +48,19 @@ class TestBase32Crockford < Test::Unit::TestCase
     assert_equal "B?123", Base32::Crockford.normalize("BU-123")
   end
 
+  def test_normalize_with_checksum
+    assert_equal "B?123", Base32::Crockford.normalize("BU-123", :checksum => true)
+    assert_equal "B123U", Base32::Crockford.normalize("B123U", :checksum => true)
+  end
+
   def test_valid
     assert_equal true, Base32::Crockford.valid?("hello-world")
     assert_equal false, Base32::Crockford.valid?("BU-123")
+  end
+
+  def test_valid_with_checksum
+    assert_equal true, Base32::Crockford.valid?("B123U", :checksum => true)
+    assert_equal false, Base32::Crockford.valid?("BU-123", :checksum => true)
   end
 
   def test_length_and_hyphenization
@@ -60,5 +70,27 @@ class TestBase32Crockford < Test::Unit::TestCase
     assert_equal "00-010",
       Base32::Crockford.encode(32, :length => 5, :split => 3)
   end
-end
 
+  def test_encoding_checksum
+    assert_equal "16JD",
+      Base32::Crockford.encode(1234, :checksum => true)
+    assert_equal "016JD",
+      Base32::Crockford.encode(1234, :length => 5, :checksum => true)
+    assert_equal "0-16-JD",
+      Base32::Crockford.encode(1234, :length => 5, :split => 2, :checksum => true)
+  end
+
+  def test_decoding_checksum
+    assert_equal 1234,
+      Base32::Crockford.decode("16JD", :checksum => true)
+    assert_equal 1234,
+      Base32::Crockford.decode("016JD", :length => 5, :checksum => true)
+    assert_equal 1234,
+      Base32::Crockford.decode("0-16-JD", :length => 5, :split => 2, :checksum => true)
+  end
+
+  def test_decoding_invalid_checksum
+    assert_equal nil,
+      Base32::Crockford.decode("16JC", :checksum => true)
+  end
+end
