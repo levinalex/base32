@@ -16,4 +16,5 @@ spec = Gem::Specification.new do |s|
   s.email = "mail@levinalex.net"
 
   s.add_development_dependency 'rake'
+  s.license = ['Ruby']
 end
